@@ -114,6 +114,23 @@ Geometry* Program::createLine(double x1, double y1, double x2, double y2, glm::v
 	return line;
 }
 
+Cell** Program::createGrid(int w, int h) {
+	Cell** grid = new Cell*[w];
+	for (int i = 0; i < w; i++) {
+		grid[i] = new Cell[h];
+	}
+	for (int i = 0; i < w; i++) {
+		for (int j = 0; j < h; j++) {
+			grid[i][j] = Cell(i,j);
+			renderEngine->assignBuffers(grid[i][j]);
+			renderEngine->updateBuffers(grid[i][j]);
+			geometryObjects.push_back((Geometry*)&grid[i][j]);
+		}
+	}
+	
+	return grid;
+}
+
 void Program::drawUI() {
 	// Start the Dear ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
@@ -158,7 +175,7 @@ void Program::mainLoop() {
 	//createTestGeometryObject();
 	//createPoint(0, 0);
 	//createPoint(-10, 10);
-	
+	createGrid(5, 5);
 	
 	// Our state
 	show_test_window = false;
