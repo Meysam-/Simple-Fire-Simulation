@@ -35,8 +35,10 @@ private:
 	bool show_test_window;
 	ImVec4 clear_color;
 
-	int order; //k
-	float u_animate, u_inc; //paramter increments
+	float cellSize;
+	float fireLevel;
+	int w; // width
+	int h; // hight
 
 	static void error(int error, const char* description);
 	void setupWindow();

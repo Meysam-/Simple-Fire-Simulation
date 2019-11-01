@@ -115,16 +115,16 @@ Geometry* Program::createLine(double x1, double y1, double x2, double y2, glm::v
 }
 
 Cell** Program::createGrid(int w, int h) {
+
 	Cell** grid = new Cell*[w];
 	for (int i = 0; i < w; i++) {
 		grid[i] = new Cell[h];
 	}
 	for (int i = 0; i < w; i++) {
 		for (int j = 0; j < h; j++) {
-			grid[i][j] = Cell(i,j);
-			renderEngine->assignBuffers(grid[i][j]);
-			renderEngine->updateBuffers(grid[i][j]);
-			geometryObjects.push_back((Geometry*)&grid[i][j]);
+			int before = geometryObjects.size();
+			grid[i][j] = Cell((i-(w/2))*cellSize, (j-(h/2))*cellSize, cellSize);
+			grid[i][j].setupRenderEngine(renderEngine, &geometryObjects);
 		}
 	}
 	
@@ -150,7 +150,7 @@ void Program::drawUI() {
 		//ImGui::SameLine();
 		//ImGui::InputInt("order", &order);
 		//ImGui::SliderFloat("step size", &u_inc, 0.001f, 1.0f);
-		//ImGui::SliderFloat("animation", &u_animate, 0.0f, 1.0f);
+		ImGui::SliderFloat("Fire Level", &fireLevel, 0.0f, 1.0f);
 	
 		if (ImGui::Button("Clean")) {                            // Buttons return true when clicked (most widgets return true when edited/activated)
 			Program::geometryObjects.clear();
@@ -175,7 +175,10 @@ void Program::mainLoop() {
 	//createTestGeometryObject();
 	//createPoint(0, 0);
 	//createPoint(-10, 10);
-	createGrid(5, 5);
+	fireLevel = 1.0;
+	cellSize = 0.45;
+	w = h = 40;
+	Cell** grid = createGrid(w, h);
 	
 	// Our state
 	show_test_window = false;
@@ -215,7 +218,10 @@ void Program::mainLoop() {
 			double epsilon = 0.1;
 			float x = point.first * factor - 10.0;
 			float y = 10.0 - point.second * factor;
-			createPoint(x, y);
+			int i = (x / cellSize) + (w / 2);
+			int j = (y / cellSize) + (h / 2);
+			grid[i][j].setFireLevel(fireLevel);
+			//createPoint(x, y);
 		}
 		
 
