@@ -35,10 +35,13 @@ private:
 	bool show_test_window;
 	ImVec4 clear_color;
 
+	Cell** grid;
 	float cellSize;
 	float fireLevel;
 	int w; // width
 	int h; // hight
+
+	bool sim_run;
 
 	static void error(int error, const char* description);
 	void setupWindow();
@@ -50,4 +53,5 @@ private:
 	Geometry* createPoint(float x, float y, glm::vec3 color);
 	Geometry* createLine(double x1, double y1, double x2, double y2, glm::vec3 color);
 	Cell** createGrid(int w, int h);
+	void applyRules();
 };

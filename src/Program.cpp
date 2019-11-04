@@ -122,7 +122,6 @@ Cell** Program::createGrid(int w, int h) {
 	}
 	for (int i = 0; i < w; i++) {
 		for (int j = 0; j < h; j++) {
-			int before = geometryObjects.size();
 			grid[i][j] = Cell((i-(w/2))*cellSize, (j-(h/2))*cellSize, cellSize);
 			grid[i][j].setupRenderEngine(renderEngine, &geometryObjects);
 		}
@@ -130,7 +129,29 @@ Cell** Program::createGrid(int w, int h) {
 	
 	return grid;
 }
+void Program::applyRules() {
+	double** newValue = new double* [w];
+	for (int i = 0; i < w; ++i)
+		newValue[i] = new double[h];
 
+	for (int i = 1; i < w-1; i++) {
+		for (int j = 1; j < h-1; j++) {
+			double sum1 = grid[i + 1][j].getFireLevel() + grid[i - 1][j].getFireLevel() + grid[i][j + 1].getFireLevel() + grid[i][j - 1].getFireLevel();
+			double sum2 = grid[i + 1][j + 1].getFireLevel() + grid[i - 1][j + 1].getFireLevel() + grid[i + 1][j - 1].getFireLevel() + grid[i - 1][j - 1].getFireLevel();
+			newValue[i][j] = (sum1 + sum2) / (4 + (4 / sqrt(2)));
+		}
+	}
+	for (int i = 1; i < w - 1; i++) {
+		for (int j = 1; j < h - 1; j++) {
+			grid[i][j].setFireLevel(newValue[i][j]);
+		}
+	}
+
+	for (int i = 0; i < h; ++i) {
+		delete[] newValue[i];
+	}
+	delete[] newValue;
+}
 void Program::drawUI() {
 	// Start the Dear ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
@@ -153,9 +174,16 @@ void Program::drawUI() {
 		ImGui::SliderFloat("Fire Level", &fireLevel, 0.0f, 1.0f);
 	
 		if (ImGui::Button("Clean")) {                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			Program::geometryObjects.clear();
+			for (int i = 0; i < w; i++) {
+				for (int j = 0; j < h; j++) {
+					grid[i][j].setFireLevel(0);
+				}
+			}
 		}
 		ImGui::SameLine();
+		if (ImGui::Button("Pause/Resume")) {                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			sim_run = !sim_run;
+		}
 		//ImGui::Checkbox("Click me!", &show_test_window);
 		ImGui::End();
 	}
@@ -176,9 +204,10 @@ void Program::mainLoop() {
 	//createPoint(0, 0);
 	//createPoint(-10, 10);
 	fireLevel = 1.0;
-	cellSize = 0.45;
+	cellSize = 0.4;
 	w = h = 40;
-	Cell** grid = createGrid(w, h);
+	grid = createGrid(w, h);
+	sim_run = false;
 	
 	// Our state
 	show_test_window = false;
@@ -220,10 +249,15 @@ void Program::mainLoop() {
 			float y = 10.0 - point.second * factor;
 			int i = (x / cellSize) + (w / 2);
 			int j = (y / cellSize) + (h / 2);
-			grid[i][j].setFireLevel(fireLevel);
+			if(i >= 0 && i < w && j >= 0 && j < h)
+				grid[i][j].setFireLevel(fireLevel);
 			//createPoint(x, y);
 		}
 		
+		if (sim_run) {
+			applyRules();
+			_sleep(50);
+		}
 
 		drawUI();
 

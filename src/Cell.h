@@ -25,6 +25,7 @@ public:
 
 	void setupRenderEngine(RenderEngine* renderEngine, std::vector<Geometry*>* geometryObjects);
 	void Cell::setFireLevel(double fireLevel);
+	double Cell::getFireLevel();
 	/**/
 };
 

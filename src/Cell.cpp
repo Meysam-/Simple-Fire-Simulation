@@ -42,3 +42,7 @@ void Cell::setFireLevel(double fireLevel) {
 	inner.color = inner.color = glm::vec3(fire_level, 1 - fire_level, 0);
 	renderEngine->updateBuffers(inner);
 }
+
+double Cell::getFireLevel() {
+	return fire_level;
+}
