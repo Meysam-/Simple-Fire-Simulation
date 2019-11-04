@@ -8,6 +8,7 @@ Cell::Cell(double pos_x, double pos_y, double size) {
 	Cell::size = size;
 	Cell::pos_x = pos_x;
 	Cell::pos_y = pos_y;
+	Cell::fire_level = 0.0;
 
 	outline = Geometry(GL_LINE_STRIP);
 	outline.color = glm::vec3(0, 0, 0);
